@@ -1,0 +1,4 @@
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src *"
