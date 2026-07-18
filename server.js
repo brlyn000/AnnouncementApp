@@ -19,16 +19,16 @@ app.use(cors());
 app.use(express.static(path.join(__dirname)));
 
 app.get('/api/peserta', async (req, res) => {
-    const { nama, email } = req.query;
+    const { nama, noHp } = req.query;
 
-    if (!nama && !email) {
-        return res.status(400).json({ message: 'Masukkan nama atau email' });
+    if (!nama && !noHp) {
+        return res.status(400).json({ message: 'Masukkan nama atau nomor HP' });
     }
 
     try {
         const [rows] = await db.execute(
-            'SELECT nama, no_hp AS noHp, posisi, email, status FROM peserta WHERE LOWER(nama) = LOWER(?) OR LOWER(email) = LOWER(?)',
-            [nama || '', email || '']
+            'SELECT nama, no_hp AS noHp, posisi, email, status FROM peserta WHERE LOWER(nama) = LOWER(?) OR no_hp = ?',
+            [nama || '', noHp || '']
         );
 
         if (rows.length === 0) {

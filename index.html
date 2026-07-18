@@ -37,12 +37,12 @@
     <!-- Search Section -->
     <main class="max-w-2xl mx-auto px-6 pb-16">
         <div class="fade-in bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl">
-            <label class="block text-red-500 font-semibold mb-2 text-sm uppercase tracking-wider">Nama / Email</label>
+            <label class="block text-red-500 font-semibold mb-2 text-sm uppercase tracking-wider">Nama / Nomor HP</label>
             <div class="flex gap-3">
                 <input
                     id="inputNama"
                     type="text"
-                    placeholder="Masukkan Nama / Email"
+                    placeholder="Masukkan Nama / Nomor HP"
                     class="flex-1 bg-gray-100 border border-red text-red-500 placeholder-red-400 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition"
                 />
                 <button
@@ -62,19 +62,34 @@
     <script>
         function renderResult(data) {
             const result = document.getElementById('result');
-            const isDiterima = data.status === 'diterima';
-            const headerBg = isDiterima ? 'bg-blue-600' : 'bg-red-600';
-            const judulStatus = isDiterima ? 'SELAMAT!' : 'TERIMA KASIH!';
-            const pesanStatus = isDiterima
-                ? 'Kami dengan bangga menerima kamu menjadi bagian dari PKKMB 2025. Selamat bergabung!'
-                : 'Mohon maaf saat ini kami belum bisa menerima kamu menjadi Panitia PKKMB 2025. Terimakasih atas antusiasnya dan semoga kita dapat bekerjasama di lain waktu!';
+
+            const statusMap = {
+                diterima: {
+                    bg: 'bg-blue-600',
+                    judul: 'SELAMAT!',
+                    pesan: 'Kami dengan bangga menerima kamu menjadi bagian dari PKKMB 2025. Selamat bergabung!'
+                },
+                ditolak: {
+                    bg: 'bg-red-600',
+                    judul: 'TERIMA KASIH!',
+                    pesan: 'Mohon maaf saat ini kami belum bisa menerima kamu menjadi Panitia PKKMB 2025. Terimakasih atas antusiasnya dan semoga kita dapat bekerjasama di lain waktu!'
+                },
+                undangan: {
+                    bg: 'bg-green-600',
+                    judul: 'KAMU DIUNDANG!',
+                    pesan: 'Kamu mendapatkan undangan khusus untuk hadir dalam kegiatan PKKMB 2025. Sampai jumpa di sana!'
+                }
+            };
+
+            const s = statusMap[data.status] || statusMap.ditolak;
+            const emailText = data.email ? data.email : '<span class="italic text-gray-400">Data kosong</span>';
 
             result.className = 'mt-5 bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-200 text-sm';
             result.innerHTML =
-                '<div class="' + headerBg + ' px-6 py-5 flex justify-between items-start">' +
+                '<div class="' + s.bg + ' px-6 py-5 flex justify-between items-start">' +
                     '<div class="text-white max-w-xs">' +
-                        '<p class="text-2xl font-black tracking-wide">' + judulStatus + '</p>' +
-                        '<p class="mt-1 text-sm leading-relaxed opacity-90">' + pesanStatus + '</p>' +
+                        '<p class="text-2xl font-black tracking-wide">' + s.judul + '</p>' +
+                        '<p class="mt-1 text-sm leading-relaxed opacity-90">' + s.pesan + '</p>' +
                     '</div>' +
                     '<div class="text-right text-white shrink-0 ml-4">' +
                         '<img src="logo.png" class="w-20" alt="Logo PKKMB 2025">' +
@@ -82,9 +97,9 @@
                 '</div>' +
                 '<div class="px-6 py-5 grid grid-cols-2 gap-x-8 gap-y-4 text-gray-700">' +
                     '<div><p class="text-gray-400 text-xs mb-0.5">Nama:</p><p class="font-bold text-red-600">' + data.nama + '</p></div>' +
-                    '<div><p class="text-gray-400 text-xs mb-0.5">Nomer Handphone:</p><p class="font-bold text-red-600">' + data.noHp + '</p></div>' +
+                    '<div><p class="text-gray-400 text-xs mb-0.5">Nomor HP:</p><p class="font-bold text-red-600">' + (data.noHp || '<span class="italic text-gray-400">Data kosong</span>') + '</p></div>' +
                     '<div><p class="text-gray-400 text-xs mb-0.5">Posisi:</p><p class="font-bold text-red-600">' + data.posisi + '</p></div>' +
-                    '<div><p class="text-gray-400 text-xs mb-0.5">Email:</p><p class="font-bold text-red-600">' + data.email + '</p></div>' +
+                    '<div><p class="text-gray-400 text-xs mb-0.5">Email:</p><p class="font-bold text-red-600">' + emailText + '</p></div>' +
                 '</div>';
             result.classList.remove('hidden');
         }
@@ -95,7 +110,7 @@
 
             if (!query) {
                 result.className = 'mt-5 bg-yellow-500/20 border border-yellow-400/40 rounded-xl p-4 text-yellow-500 text-sm text-center';
-                result.textContent = 'Masukkan nama atau email terlebih dahulu.';
+                result.textContent = 'Masukkan nama atau nomor HP terlebih dahulu.';
                 result.classList.remove('hidden');
                 return;
             }
@@ -106,10 +121,10 @@
 
             try {
                 const API_URL = document.querySelector('meta[name="api-url"]')?.content || 'http://localhost:3000';
-            const res = await fetch(API_URL + '/api/peserta?' + new URLSearchParams({ nama: query, email: query }));
+            const res = await fetch(API_URL + '/api/peserta?' + new URLSearchParams({ nama: query, noHp: query }));
                 if (!res.ok) {
                     result.className = 'mt-5 bg-yellow-500/20 border border-yellow-400/40 rounded-xl p-4 text-yellow-600 text-sm text-center';
-                    result.textContent = 'Data untuk "' + query + '" tidak ditemukan.';
+                    result.textContent = 'Mungkin kamu belum mendaftar atau nama dan nomor HP salah.';
                     return;
                 }
                 const data = await res.json();
