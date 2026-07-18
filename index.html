@@ -157,7 +157,7 @@
                 const API_URL = document.querySelector('meta[name="api-url"]')?.content || 'http://localhost:3000';
                 const [res] = await Promise.all([
                     fetch(API_URL + '/api/peserta?' + new URLSearchParams({ nama: query, noHp: query })),
-                    new Promise(resolve => setTimeout(resolve, 5000))
+                    new Promise(resolve => setTimeout(resolve, 3000))
                 ]);
 
                 loading.classList.add('hidden');
