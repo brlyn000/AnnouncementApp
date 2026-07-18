@@ -16,7 +16,12 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(30px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         .fade-in { animation: fadeIn 0.6s ease forwards; }
+        .card-appear { animation: cardAppear 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
         .btn-cek { background-color: #FF5EBF; }
         .btn-cek:hover { background-color: #e04daa; }
         .label-color { color: #FF5EBF; }
@@ -110,7 +115,7 @@
                   '</div>'
                 : '';
 
-            result.className = 'mt-5 bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-200 text-sm';
+            result.className = 'mt-5 bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-200 text-sm card-appear';
             result.innerHTML =
                 '<div class="' + s.headerClass + ' px-4 py-4 flex justify-between items-start">' +
                     '<div class="text-white max-w-xs">' +
